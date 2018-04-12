@@ -4,13 +4,18 @@ import io.openmessaging.Future;
 import io.openmessaging.FutureListener;
 import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
+import io.openmessaging.interceptor.ProducerInterceptor;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ProducerAdaptor {
 
     private Producer producer;
 
+    private ConcurrentHashMap<Integer, ProducerInterceptor> interceptors;
+
     public ProducerAdaptor(Producer producer) {
         this.producer = producer;
+        interceptors = new ConcurrentHashMap<Integer, ProducerInterceptor>();
     }
 
     public native void operationComplete(long invokeId, Future<SendResult> future);
@@ -32,6 +37,18 @@ public class ProducerAdaptor {
                 ProducerAdaptor.this.operationComplete(invokeId, future);
             }
         });
+    }
+
+    public void addInterceptor(int index, ProducerInterceptor interceptor) {
+        interceptors.put(index, interceptor);
+        producer.addInterceptor(interceptor);
+    }
+
+    public void removeInterceptor(int index) {
+        ProducerInterceptor interceptor = interceptors.remove(index);
+        if (null != interceptor) {
+            producer.removeInterceptor(interceptor);
+        }
     }
 
 }
