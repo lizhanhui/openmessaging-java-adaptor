@@ -17,6 +17,7 @@
     </dependencies>
 
     <build>
+        <finalName>openmessaging-adaptor</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
